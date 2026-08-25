@@ -53,20 +53,23 @@ function loadActivities() {
 }
 
 function selectActivities(activities, { activity }) {
-  if (activity) {
-    const match = activities.find((item) => item.id === activity);
-    if (!match) {
-      throw new Error(`Activité inconnue: ${activity}. Ids: ${activities.map((item) => item.id).join(", ")}`);
+  if (!activity) {
+    throw new Error("Passe --activity yoga ou --activity escalade");
+  }
+
+  const match = activities.find((item) => item.id === activity);
+  if (!match) {
+    throw new Error(`Activité inconnue: ${activity}. Ids: ${activities.map((item) => item.id).join(", ")}`);
+  }
+
+  if (process.env.GITHUB_EVENT_NAME === "schedule") {
+    const now = parisNow();
+    if (match.weekday !== now.weekday || match.hour !== now.hour) {
+      return [];
     }
-    return [match];
   }
 
-  if (process.env.GITHUB_EVENT_NAME === "workflow_dispatch") {
-    return activities;
-  }
-
-  const now = parisNow();
-  return activities.filter((item) => item.weekday === now.weekday && item.hour === now.hour);
+  return [match];
 }
 
 async function postToSlack(activity) {

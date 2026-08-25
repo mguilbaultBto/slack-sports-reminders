@@ -1,0 +1,20 @@
+name: Yoga (lundi 17h)
+
+on:
+  schedule:
+    # Lundi seulement. 15:00 UTC = 17h Paris en été, 16:00 UTC = 17h en hiver.
+    - cron: "0 15,16 * * 1"
+  workflow_dispatch:
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Envoyer Yoga
+        env:
+          SLACK_WEBHOOK_YOGA: ${{ secrets.SLACK_WEBHOOK_YOGA }}
+        run: node scripts/send.js --activity yoga

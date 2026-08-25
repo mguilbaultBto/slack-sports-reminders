@@ -5,7 +5,10 @@ Envoie automatiquement :
 - **lundi 17h** (Paris) : `Yoga demain midi ?`
 - **mercredi 17h** (Paris) : `Escalade demain`
 
-Pas de serveur : un cron GitHub Actions poste via des Incoming Webhooks Slack.
+Pas de serveur : **2 workflows séparés** (un par sport).
+
+- **Yoga (lundi 17h)** → uniquement le message yoga
+- **Escalade (mercredi 17h)** → uniquement le message escalade
 
 ## 1. Créer les webhooks Slack
 
@@ -29,10 +32,10 @@ npm run send:escalade
 2. **Settings → Secrets and variables → Actions** :
    - `SLACK_WEBHOOK_YOGA`
    - `SLACK_WEBHOOK_ESCALADE`
-3. **Actions → Remind sport → Run workflow** pour tester tout de suite.
-4. Le cron tourne lundi et mercredi vers 17h Paris (gère l’heure d’été / hiver).
+3. **Actions** : lance **Yoga (lundi 17h)** ou **Escalade (mercredi 17h)** à la main pour tester (un seul message à la fois).
+4. Ensuite le cron envoie yoga chaque lundi 17h, escalade chaque mercredi 17h (heure de Paris).
 
-Le premier run programmé d’un repo peut prendre jusqu’à une heure après le push. Un run manuel (`workflow_dispatch`) marche tout de suite.
+Le premier run programmé d’un repo peut prendre jusqu’à une heure après le push. Un run manuel marche tout de suite.
 
 ## Ajouter un sport
 
@@ -50,4 +53,4 @@ Le premier run programmé d’un repo peut prendre jusqu’à une heure après l
 
 `weekday` : 0 = dimanche, 1 = lundi, …, 6 = samedi.
 
-Ajoute le secret GitHub correspondant et, si le jour n’est pas lundi/mercredi, élargis le cron dans `.github/workflows/remind.yml`.
+Ajoute le secret GitHub correspondant et un workflow (copie `yoga.yml` ou `escalade.yml`) avec le bon jour cron (`1` = lundi, `3` = mercredi, `4` = jeudi).
