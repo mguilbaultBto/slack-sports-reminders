@@ -1,0 +1,28 @@
+name: Remind sport
+
+on:
+  schedule:
+    # 15:00 UTC = 17h Paris en été, 16:00 UTC = 17h Paris en hiver.
+    # Le script ne poste que si l'heure de Paris est bien 17:00.
+    - cron: "0 15,16 * * 1,3"
+  workflow_dispatch:
+    inputs:
+      activity:
+        description: "yoga, escalade, ou vide pour tout envoyer"
+        required: false
+        default: ""
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Envoyer le rappel Slack
+        env:
+          SLACK_WEBHOOK_YOGA: ${{ secrets.SLACK_WEBHOOK_YOGA }}
+          SLACK_WEBHOOK_ESCALADE: ${{ secrets.SLACK_WEBHOOK_ESCALADE }}
+          ACTIVITY: ${{ github.event.inputs.activity }}
+        run: node scripts/send.js

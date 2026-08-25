@@ -1,0 +1,16 @@
+[
+  {
+    "id": "yoga",
+    "weekday": 1,
+    "hour": 17,
+    "message": "Yoga demain midi ? 👀",
+    "webhookEnv": "SLACK_WEBHOOK_YOGA"
+  },
+  {
+    "id": "escalade",
+    "weekday": 3,
+    "hour": 17,
+    "message": "Escalade demain midi ? 👀",
+    "webhookEnv": "SLACK_WEBHOOK_ESCALADE"
+  }
+]
