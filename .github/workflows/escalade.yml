@@ -1,9 +1,9 @@
-name: Escalade (mercredi 11h08)
+name: Escalade (mercredi 16h08)
 
 on:
   schedule:
-    # 09:08 UTC = 11:08 Paris en été (test du retard GitHub).
-    - cron: "8 9 * * 3"
+    # 14:08 UTC = 16:08 Paris en été. En hiver (CET) : "8 15 * * 3".
+    - cron: "8 14 * * 3"
   workflow_dispatch:
 
 jobs:
