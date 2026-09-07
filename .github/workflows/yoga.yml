@@ -1,9 +1,9 @@
-name: Yoga (lundi 17h)
+name: Yoga (lundi 11h08)
 
 on:
   schedule:
-    # Lundi seulement. 15:00 UTC = 17h Paris en été, 16:00 UTC = 17h en hiver.
-    - cron: "0 15,16 * * 1"
+    # 09:08 UTC = 11:08 Paris en été (test du retard GitHub).
+    - cron: "8 9 * * 1"
   workflow_dispatch:
 
 jobs:

@@ -5,7 +5,6 @@ const path = require("node:path");
 
 const ROOT = path.resolve(__dirname, "..");
 const ACTIVITIES_PATH = path.join(ROOT, "activities.json");
-const TIMEZONE = "Europe/Paris";
 
 loadDotEnv(path.join(ROOT, ".env"));
 
@@ -33,26 +32,11 @@ function parseArgs(argv) {
   return args;
 }
 
-function parisNow(date = new Date()) {
-  const parts = new Intl.DateTimeFormat("en-GB", {
-    timeZone: TIMEZONE,
-    weekday: "short",
-    hour: "numeric",
-    hourCycle: "h23",
-  }).formatToParts(date);
-
-  const weekdayLabel = parts.find((part) => part.type === "weekday")?.value;
-  const hour = Number(parts.find((part) => part.type === "hour")?.value);
-  const weekdayMap = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-
-  return { weekday: weekdayMap[weekdayLabel], hour };
-}
-
 function loadActivities() {
   return JSON.parse(fs.readFileSync(ACTIVITIES_PATH, "utf8"));
 }
 
-function selectActivities(activities, { activity }) {
+function selectActivity(activities, { activity }) {
   if (!activity) {
     throw new Error("Passe --activity yoga ou --activity escalade");
   }
@@ -62,14 +46,7 @@ function selectActivities(activities, { activity }) {
     throw new Error(`Activité inconnue: ${activity}. Ids: ${activities.map((item) => item.id).join(", ")}`);
   }
 
-  if (process.env.GITHUB_EVENT_NAME === "schedule") {
-    const now = parisNow();
-    if (match.weekday !== now.weekday || match.hour !== now.hour) {
-      return [];
-    }
-  }
-
-  return [match];
+  return match;
 }
 
 async function postToSlack(activity) {
@@ -91,18 +68,9 @@ async function postToSlack(activity) {
 }
 
 async function main() {
-  const activities = selectActivities(loadActivities(), parseArgs(process.argv.slice(2)));
-
-  if (activities.length === 0) {
-    const now = parisNow();
-    console.log(`Rien à envoyer (Paris: jour=${now.weekday}, heure=${now.hour}).`);
-    return;
-  }
-
-  for (const activity of activities) {
-    await postToSlack(activity);
-    console.log(`Envoyé: ${activity.id} — ${activity.message}`);
-  }
+  const activity = selectActivity(loadActivities(), parseArgs(process.argv.slice(2)));
+  await postToSlack(activity);
+  console.log(`Envoyé: ${activity.id} — ${activity.message}`);
 }
 
 main().catch((error) => {
