@@ -3,6 +3,7 @@
     "id": "yoga",
     "weekday": 1,
     "hour": 17,
+    "minute": 0,
     "message": "Yoga demain midi ? 👀",
     "webhookEnv": "SLACK_WEBHOOK_YOGA"
   },
@@ -10,7 +11,16 @@
     "id": "escalade",
     "weekday": 3,
     "hour": 17,
+    "minute": 0,
     "message": "Escalade demain midi ? 👀",
     "webhookEnv": "SLACK_WEBHOOK_ESCALADE"
+  },
+  {
+    "id": "test",
+    "weekday": "*",
+    "hour": 14,
+    "minute": 0,
+    "message": "Test notif Slack 👀",
+    "webhookEnv": "SLACK_WEBHOOK_TEST"
   }
 ]

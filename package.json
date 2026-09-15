@@ -1,10 +1,20 @@
 {
   "name": "sport-slack",
   "private": true,
-  "description": "Rappels Slack hebdo (yoga, escalade) via GitHub Actions",
+  "description": "Rappels Slack hebdo (yoga, escalade) via Cloud Functions",
+  "main": "functions/index.js",
+  "engines": {
+    "node": "20"
+  },
   "scripts": {
     "send": "node scripts/send.js",
     "send:yoga": "node scripts/send.js --activity yoga",
-    "send:escalade": "node scripts/send.js --activity escalade"
+    "send:escalade": "node scripts/send.js --activity escalade",
+    "send:test": "node scripts/send.js --activity test",
+    "deploy": "firebase deploy --only functions"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^6.6.0"
   }
 }

@@ -1,14 +1,12 @@
 # Rappels Slack sport
 
-Envoie automatiquement :
+Envoie automatiquement, **heure de Paris** (été / hiver gérés tout seuls) :
 
-- **lundi 17h** (Paris) : `Yoga demain midi ?`
-- **mercredi 17h** (Paris) : `Escalade demain`
+- **lundi 17h** : `Yoga demain midi ?`
+- **mercredi 17h** : `Escalade demain midi ?`
+- **tous les jours 14h** : `Test notif Slack` (webhook dédié, pour valider l’heure réelle)
 
-Pas de serveur : **2 workflows séparés** (un par sport).
-
-- **Yoga (lundi 17h)** → uniquement le message yoga
-- **Escalade (mercredi 17h)** → uniquement le message escalade
+Planifié avec **Cloud Scheduler** (Firebase Functions), pas GitHub Actions.
 
 ## 1. Créer les webhooks Slack
 
@@ -20,22 +18,39 @@ Pas de serveur : **2 workflows séparés** (un par sport).
 ## 2. Tester en local
 
 ```bash
-cp .env.example .env
-# colle les 2 URLs dans .env
+cp .env.example .env.local
+# colle les URLs dans .env.local
 npm run send:yoga
 npm run send:escalade
+npm run send:test
 ```
 
-## 3. Activer le cron GitHub
+Utilise **`.env.local`** en local, pas `.env` : Firebase charge `.env` comme variables d’environnement classiques, ce qui entre en conflit avec Secret Manager au deploy.
 
-1. Pousse ce repo sur GitHub.
-2. **Settings → Secrets and variables → Actions** :
-   - `SLACK_WEBHOOK_YOGA`
-   - `SLACK_WEBHOOK_ESCALADE`
-3. **Actions** : lance **Yoga (lundi 17h)** ou **Escalade (mercredi 17h)** à la main pour tester (un seul message à la fois).
-4. Ensuite le cron envoie yoga chaque lundi 17h, escalade chaque mercredi 17h (heure de Paris).
+## 3. Déployer les Cloud Functions
 
-Le premier run programmé d’un repo peut prendre jusqu’à une heure après le push. Un run manuel marche tout de suite.
+Il faut un projet Firebase en plan **Blaze** (facturation à l’usage). Deux webhooks par semaine restent en pratique à 0 €.
+
+```bash
+npm install
+firebase use --add   # si le projet n’est pas déjà sélectionné
+```
+
+Enregistre les webhooks dans Secret Manager :
+
+```bash
+firebase functions:secrets:set SLACK_WEBHOOK_YOGA
+firebase functions:secrets:set SLACK_WEBHOOK_ESCALADE
+firebase functions:secrets:set SLACK_WEBHOOK_TEST
+```
+
+Puis :
+
+```bash
+npm run deploy
+```
+
+L’heure part de `activities.json` (`hour` / `minute` / `weekday`) avec le fuseau `Europe/Paris`. Pour tester tout de suite sans attendre le cron : **Google Cloud Console → Cloud Scheduler → Run now** sur le job `yoga` ou `escalade`.
 
 ## Ajouter un sport
 
@@ -46,6 +61,7 @@ Le premier run programmé d’un repo peut prendre jusqu’à une heure après l
   "id": "course",
   "weekday": 4,
   "hour": 17,
+  "minute": 0,
   "message": "Course demain matin ?",
   "webhookEnv": "SLACK_WEBHOOK_COURSE"
 }
@@ -53,4 +69,9 @@ Le premier run programmé d’un repo peut prendre jusqu’à une heure après l
 
 `weekday` : 0 = dimanche, 1 = lundi, …, 6 = samedi.
 
-Ajoute le secret GitHub correspondant et un workflow (copie `yoga.yml` ou `escalade.yml`) avec le bon jour cron (`1` = lundi, `3` = mercredi, `4` = jeudi).
+Ensuite :
+
+```bash
+firebase functions:secrets:set SLACK_WEBHOOK_COURSE
+npm run deploy
+```

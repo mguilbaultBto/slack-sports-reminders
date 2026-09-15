@@ -1,0 +1,19 @@
+{
+  "functions": [
+    {
+      "source": ".",
+      "codebase": "default",
+      "ignore": [
+        ".git",
+        ".github",
+        ".firebase",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        ".env",
+        ".env.*",
+        "README.md",
+        "node_modules"
+      ]
+    }
+  ]
+}

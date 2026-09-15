@@ -7,6 +7,7 @@ const ROOT = path.resolve(__dirname, "..");
 const ACTIVITIES_PATH = path.join(ROOT, "activities.json");
 
 loadDotEnv(path.join(ROOT, ".env"));
+loadDotEnv(path.join(ROOT, ".env.local"));
 
 function loadDotEnv(filePath) {
   if (!fs.existsSync(filePath)) return;
@@ -38,7 +39,7 @@ function loadActivities() {
 
 function selectActivity(activities, { activity }) {
   if (!activity) {
-    throw new Error("Passe --activity yoga ou --activity escalade");
+    throw new Error(`Passe --activity ${activities.map((item) => item.id).join("|")}`);
   }
 
   const match = activities.find((item) => item.id === activity);
@@ -67,13 +68,23 @@ async function postToSlack(activity) {
   }
 }
 
-async function main() {
-  const activity = selectActivity(loadActivities(), parseArgs(process.argv.slice(2)));
+async function sendActivity(activityId) {
+  const activity = selectActivity(loadActivities(), { activity: activityId });
   await postToSlack(activity);
   console.log(`Envoyé: ${activity.id} — ${activity.message}`);
+  return activity;
 }
 
-main().catch((error) => {
-  console.error(error.message);
-  process.exit(1);
-});
+async function main() {
+  await sendActivity(parseArgs(process.argv.slice(2)).activity);
+}
+
+module.exports = { sendActivity, postToSlack, loadActivities, selectActivity };
+
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(error.message);
+    process.exit(1);
+  });
+}
+
