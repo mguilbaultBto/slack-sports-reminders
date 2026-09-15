@@ -4,7 +4,6 @@ Envoie automatiquement, **heure de Paris** (été / hiver gérés tout seuls) :
 
 - **lundi 17h** : `Yoga demain midi ?`
 - **mercredi 17h** : `Escalade demain midi ?`
-- **tous les jours 14h** : `Test notif Slack` (webhook dédié, pour valider l’heure réelle)
 
 Planifié avec **Cloud Scheduler** (Firebase Functions), pas GitHub Actions.
 
@@ -22,7 +21,6 @@ cp .env.example .env.local
 # colle les URLs dans .env.local
 npm run send:yoga
 npm run send:escalade
-npm run send:test
 ```
 
 Utilise **`.env.local`** en local, pas `.env` : Firebase charge `.env` comme variables d’environnement classiques, ce qui entre en conflit avec Secret Manager au deploy.
@@ -41,7 +39,6 @@ Enregistre les webhooks dans Secret Manager :
 ```bash
 firebase functions:secrets:set SLACK_WEBHOOK_YOGA
 firebase functions:secrets:set SLACK_WEBHOOK_ESCALADE
-firebase functions:secrets:set SLACK_WEBHOOK_TEST
 ```
 
 Puis :

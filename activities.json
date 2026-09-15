@@ -14,13 +14,5 @@
     "minute": 0,
     "message": "Escalade demain midi ? 👀",
     "webhookEnv": "SLACK_WEBHOOK_ESCALADE"
-  },
-  {
-    "id": "test",
-    "weekday": "*",
-    "hour": 14,
-    "minute": 0,
-    "message": "Test notif Slack 👀",
-    "webhookEnv": "SLACK_WEBHOOK_TEST"
   }
 ]
